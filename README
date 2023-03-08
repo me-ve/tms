@@ -12,7 +12,7 @@ The user can create the program for it by creating state table file with .stt ex
 ```
 where
 ```
-<empty symbol> - a symbol which is considered by simulator as 'empty'
+<empty symbol> - a symbol which is considered by simulator as 'empty' (whitespaces don't work yet)
 <start state name> - the state that is called in the beginning of processing the tape
 
 <nth state> - the tuple in format (%name,%symbol_in,%symbol_out,%next_state,%direction):

@@ -7,7 +7,8 @@ def load_instructions(filename) -> tuple[chr, str, dict]:
     states = {}
     with open(filename, "r") as file:
         text = file.read().strip()
-        lines = text.split("\n")
+    lines = text.split("\n")
+    # TODO fix using whitespaces as null_char
     assert len(lines[0]) == 1, f"Error: expected one character in top line ({len(lines[0])} characters != 1)"
     null_char, start_state, states_lines = lines[0], lines[1], lines[2:]
     for state in states_lines:
