@@ -1,0 +1,10 @@
+?
+start
+(start,0,0,start,R)
+(start,1,1,start,R)
+(start,?,?,dec,L)
+(dec,0,1,dec,L)
+(dec,1,0,end,R)
+(dec,?,?,end,R)
+(end,0,0,end,R)
+(end,1,1,end,R)

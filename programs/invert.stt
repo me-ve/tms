@@ -1,0 +1,7 @@
+?
+start
+(start,0,0,start,L)
+(start,1,1,start,L)
+(start,?,?,invert,R)
+(invert,0,1,invert,R)
+(invert,1,0,invert,R)
