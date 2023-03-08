@@ -1,10 +1,13 @@
 ?
 start
+
 (start,0,0,start,R)
 (start,1,1,start,R)
 (start,?,?,inc,L)
+
 (inc,0,1,end,R)
 (inc,1,0,inc,L)
 (inc,?,1,end,R)
+
 (end,0,0,end,R)
 (end,1,1,end,R)

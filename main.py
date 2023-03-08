@@ -12,6 +12,8 @@ def load_instructions(filename) -> tuple[chr, str, dict]:
     assert len(lines[0]) == 1, f"Error: expected one character in top line ({len(lines[0])} characters != 1)"
     null_char, start_state, states_lines = lines[0], lines[1], lines[2:]
     for state in states_lines:
+        if state == "":
+            continue
         state = state.replace("(", "").replace(")", "").replace(" ","").split(",")
         assert len(state) == 5, f"Error: wrong state parameters count ({len(state)} != 5)"
         name, symbol_in, symbol_out, next_state, direction = state
@@ -86,7 +88,7 @@ def process_state(tape:list, states:dict, current_state:str, head:int, null_char
         tape, head = adjust_tape(tape, head, null_char)
     return state_exists, head, next_state
 def main_loop(states_file:str, tape_file:str):
-    sleep_time = 1
+    sleep_time = 0
     null_char, start_state_name, states = load_instructions(states_file)
     current_state = start_state_name
     tape, head = load_tape(tape_file)
