@@ -89,6 +89,7 @@ def process_state(tape:list, states:dict, current_state:str, head:int, null_char
     return state_exists, head, next_state
 def main_loop(states_file:str, tape_file:str):
     sleep_time = 0
+    tape_display_width = 16
     null_char, start_state_name, states = load_instructions(states_file)
     current_state = start_state_name
     tape, head = load_tape(tape_file)
@@ -102,7 +103,7 @@ def main_loop(states_file:str, tape_file:str):
     ticks = 0
     while status:
         print(f"Current state: {current_state}")
-        draw_tape(tape, null_char, head, 15)
+        draw_tape(tape, null_char, head, tape_display_width)
         status, head, current_state = process_state(tape, states, current_state, head, null_char)
         ticks += 1
         time.sleep(sleep_time)
