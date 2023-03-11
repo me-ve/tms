@@ -99,6 +99,7 @@ def process_state(tape:list, states:dict, current_state:str, head:int, null_char
 def main_loop(states_file:str, tape_file:str):
     sleep_time = 0
     tape_display_width = 16
+    states_count = {}
     try:
         null_char, start_state_name, states = load_instructions(states_file)
     except Exception as e:
@@ -123,14 +124,19 @@ def main_loop(states_file:str, tape_file:str):
     status = True
     ticks = 0
     while status:
+        states_count[current_state] = states_count.get(current_state, 0)+1
         print(f"Current state: {current_state}")
         draw_tape(tape, null_char, head, tape_display_width)
         status, head, current_state = process_state(tape, states, current_state, head, null_char)
         ticks += 1
         time.sleep(sleep_time)
-    print(f"Execution ended in {ticks} ticks")
+    print(f"Execution ended in {ticks} ticks\n")
     save_tape(tape_file+".new", tape, head)
-    print(f"New tape saved into file {tape_file}.new")
+    print(f"New tape saved into file {tape_file}.new\n")
+    print(f"States execution count:")
+    states_count = sorted(states_count.items(), key=lambda x:x[1], reverse=True)
+    for name, count in states_count:
+        print(f"{name}\n\t{count:04}")
 
 def main():
     if len(sys.argv) != 3:
