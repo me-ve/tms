@@ -1,9 +1,10 @@
 #!/bin/python
 
+import re
 import sys
 import time
 
-def load_instructions(filename) -> tuple[chr, str, dict]:
+def load_instructions(filename:str) -> tuple[chr, str, dict]:
     states = {}
     with open(filename, "r") as file:
         text = file.read().strip()
@@ -14,7 +15,7 @@ def load_instructions(filename) -> tuple[chr, str, dict]:
     for state in states_lines:
         if state == "":
             continue
-        state = state.replace("(", "").replace(")", "").replace(" ","").split(",")
+        state = re.sub('[\(\) ]', '', state).split(",")
         assert len(state) == 5, f"Error: wrong state parameters count ({len(state)} != 5)"
         name, symbol_in, symbol_out, next_state, direction = state
         if name not in states:
@@ -25,7 +26,7 @@ def load_instructions(filename) -> tuple[chr, str, dict]:
         states[name][symbol_in]["direction"] = direction.upper()
     return null_char, start_state, states
 
-def load_tape(filename) -> list[chr]:
+def load_tape(filename:str) -> list[chr]:
     tape = []
     with open(filename, "r") as file:
         lines = file.read().split("\n")
@@ -34,7 +35,7 @@ def load_tape(filename) -> list[chr]:
     head_pos = int(lines[1])
     return tape, head_pos
 
-def save_tape(filename, tape, head):
+def save_tape(filename:str, tape:list[chr], head:int):
     with open(filename, "w") as file:
         file.write("".join(tape)+"\n"+str(head))
 
@@ -55,24 +56,23 @@ def draw_tape(tape:list[chr], null_char:chr, head:int, width:int) -> None:
             res += f"| {tape[i]} "
     print(res + "|" + "\n" + under_res + " ")
 
-def get_current_symbol(tape, head, null_char):
+def get_current_symbol(tape:list[chr], head:int, null_char:chr) -> chr:
     return tape[head] if head in range(len(tape)) else null_char
 
-def fetch_state(name, states, symbol) -> dict:
-    if name not in states:
+def fetch_state(name:str, states:dict, symbol:chr) -> dict:
+    state = states.get(name, {})
+    if state is None:
         return {}
-    if symbol not in states[name]:
-        return {}
-    return states[name][symbol]
+    return state.get(symbol, {})
 
 def adjust_tape(tape:list[chr], head:int, null_char:chr) -> list[chr]:
     if head not in range(len(tape)):
         if head < 0:
-            while head < 0:
-                head += 1
+            for i in range(-head):
                 tape.insert(0, null_char)
+                head += 1
         else:
-            while head >= len(tape):
+            for i in range(head - len(tape) + 1):
                 tape.append(null_char)
     return tape, head
 
@@ -99,19 +99,26 @@ def process_state(tape:list, states:dict, current_state:str, head:int, null_char
 def main_loop(states_file:str, tape_file:str):
     sleep_time = 0
     tape_display_width = 16
-    null_char, start_state_name, states = load_instructions(states_file)
+    try:
+        null_char, start_state_name, states = load_instructions(states_file)
+    except Exception as e:
+        print(f"Error: could not have read the states from file {states_file}")
+        print(f"Details: {e}")
+        exit(1)
     current_state = start_state_name
-    tape, head = load_tape(tape_file)
-    tape, head = adjust_tape(tape, head, null_char)
+    try:
+        tape, head = adjust_tape(*load_tape(tape_file), null_char)
+    except Exception as e:
+        print(f"Error: there was a problem with reading tape from file {tape_file}")
+        print(f"Details: {e}")
+        exit(1)
     print(f"Null character: {null_char}")
     print(f"Head: {head}")
     print("Available states:")
     for name in states:
         print(f"{name}:")
-        for symbol_in in states[name]:
-            symbol_out = states[name][symbol_in]["out"]
-            next_state = states[name][symbol_in]["next"]
-            direction = states[name][symbol_in]["direction"]
+        for symbol_in, properties in states[name].items():
+            symbol_out, next_state, direction = properties.values()
             print(f"\t{symbol_in}: output: {symbol_out}, next state: {next_state}, direction: {direction}")
     status = True
     ticks = 0
